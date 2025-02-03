@@ -59,7 +59,7 @@ public class DDHelperController : ControllerBase
             for (var d = 0; d < batchOfDie.NumberOfDice; d++)
             {
                 var roll = _random.Next(1, batchOfDie.NumberOfSides+1);
-                _histogram.Record(roll);
+                _histogram.Record(roll, new KeyValuePair<string, object?>("sides", batchOfDie.NumberOfSides));
                 message += roll + ";";
             }
             message += "\n";
