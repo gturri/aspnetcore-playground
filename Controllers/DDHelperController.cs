@@ -29,7 +29,7 @@ public class DDHelperController : ControllerBase
             .ToListAsync();
     }
 
-    [HttpPost(Name = "roll")]
+    [HttpPost("roll")]
     public async Task Roll([FromBody] RollRequest request)
     {
         var message = new RoomMessage
@@ -49,7 +49,7 @@ public class DDHelperController : ControllerBase
 
         foreach (var batchOfDie in request.Dice)
         {
-            message += $"{batchOfDie.NumberOfDice}D{batchOfDie.NumberOfSides}";
+            message += $"{batchOfDie.NumberOfDice}D{batchOfDie.NumberOfSides}: ";
             for (var d = 0; d < batchOfDie.NumberOfDice; d++)
             {
                 message += _random.Next(1, batchOfDie.NumberOfSides+1) + ";";
