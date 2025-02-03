@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
+using System.Diagnostics.Metrics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
 using TestApi.Messages;
 using TestApi.Model;
 
@@ -13,12 +15,16 @@ public class DDHelperController : ControllerBase
     private readonly ILogger<DDHelperController> _logger;
     private readonly Random _random;
     private readonly RoomMessagesContext _context;
+    private readonly Meter _meter;
+    private readonly Histogram<int> _histogram;
 
     public DDHelperController(ILogger<DDHelperController> logger, RoomMessagesContext context)
     {
         _logger = logger;
         _random = new Random();
         _context = context;
+        _meter = new Meter("My.GT.Meter");
+        _histogram = _meter.CreateHistogram<int>("rolls");
     }
 
     [HttpGet("last-events")]
@@ -52,7 +58,9 @@ public class DDHelperController : ControllerBase
             message += $"{batchOfDie.NumberOfDice}D{batchOfDie.NumberOfSides}: ";
             for (var d = 0; d < batchOfDie.NumberOfDice; d++)
             {
-                message += _random.Next(1, batchOfDie.NumberOfSides+1) + ";";
+                var roll = _random.Next(1, batchOfDie.NumberOfSides+1);
+                _histogram.Record(roll);
+                message += roll + ";";
             }
             message += "\n";
         }

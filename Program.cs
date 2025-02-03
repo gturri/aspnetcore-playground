@@ -13,15 +13,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<RoomMessagesContext>(opt => opt.UseInMemoryDatabase("RoomMessages"));
 
+MeterProviderBuilder m;
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
         .AddService(serviceName: builder.Environment.ApplicationName))
     .WithMetrics(metrics => metrics
         .AddAspNetCoreInstrumentation()
+        .AddMeter("My.GT.Meter")
         .AddConsoleExporter((exporterOptions, metricReaderOptions) =>
         {
-            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 1000;
+            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5000;
         }));
 
 
