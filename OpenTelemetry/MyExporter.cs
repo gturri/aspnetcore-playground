@@ -228,6 +228,13 @@ namespace TestApi.OpenTelemetry
                         this.WriteLine($"\tVersion: {metric.MeterVersion}");
                     }
 
+                    // START of the lines added
+                    this.WriteLine("\tTags:");
+                    this.WriteLine($"\t\t_sdk.metric_name: {metric.Name}");
+                    this.WriteLine($"\t\t_sdk.metric_type: {metricType}");
+                    // END of the lines added
+
+
                     if (metric.MeterTags?.Any() == true)
                     {
                         foreach (var meterTag in metric.MeterTags)

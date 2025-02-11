@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using TestApi.Model;
+using TestApi.OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +21,13 @@ builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
         .AddService(serviceName: builder.Environment.ApplicationName))
     .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation()
         .AddMeter("My.GT.Meter")
-        .AddConsoleExporter((exporterOptions, metricReaderOptions) =>
-        {
-            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5000;
-        }));
+        .AddReader(sp =>
+            {
+                var exporter = new MyExporter(new ConsoleExporterOptions());
+                return new PeriodicExportingMetricReader(exporter, 1000, 700);
+            }
+        ));
 
 
 var app = builder.Build();
