@@ -17,6 +17,7 @@ public class DDHelperController : ControllerBase
     private readonly RoomMessagesContext _context;
     private readonly Meter _meter;
     private readonly Histogram<int> _histogram;
+    private readonly Counter<int> _counterSum;
 
     public DDHelperController(ILogger<DDHelperController> logger, RoomMessagesContext context)
     {
@@ -24,7 +25,9 @@ public class DDHelperController : ControllerBase
         _random = new Random();
         _context = context;
         _meter = new Meter("My.GT.Meter");
-        _histogram = _meter.CreateHistogram<int>("rolls");
+
+        _histogram = _meter.CreateHistogram<int>("roll");
+        _counterSum = _meter.CreateCounter<int>("sum", "points", "sum");
     }
 
     [HttpGet("last-events")]
@@ -60,6 +63,7 @@ public class DDHelperController : ControllerBase
             {
                 var roll = _random.Next(1, batchOfDie.NumberOfSides+1);
                 _histogram.Record(roll, new KeyValuePair<string, object?>("sides", batchOfDie.NumberOfSides));
+                _counterSum.Add(roll);
                 message += roll + ";";
             }
             message += "\n";
