@@ -19,15 +19,19 @@ MeterProviderBuilder m;
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
-        .AddService(serviceName: builder.Environment.ApplicationName))
+        .AddService(serviceName: builder.Environment.ApplicationName)
+        .AddAttributes(new KeyValuePair<string, object>[]{new("resourceKey", "resourceValue")})
+        )
     .WithMetrics(metrics => metrics
         .AddMeter("My.GT.Meter")
-        .AddReader(sp =>
-            {
-                var exporter = new MyExporter(new ConsoleExporterOptions());
-                return new PeriodicExportingMetricReader(exporter, 1000, 700);
-            }
-        ));
+        .AddConsoleExporter()
+        //.AddReader(sp =>
+        //    {
+        //        var exporter = new MyExporter(new ConsoleExporterOptions());
+        //        return new PeriodicExportingMetricReader(exporter, 1000, 700);
+        //    }
+        //)
+        );
 
 
 var app = builder.Build();
